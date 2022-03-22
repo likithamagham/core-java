@@ -1,0 +1,183 @@
+ ////////
+import javax.servlet.http.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+
+@SuppressWarnings("serial")
+@WebServlet(
+        name = "ValidationLoginServlet",
+        urlPatterns = {"/ValidationLoginServlet"})
+public class ValidationalLoginServlet extends HttpServlet {
+
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("*ValidationLoginServlet**");
+        Login login = (Login) request.getAttribute("login");
+        String email = request.getParameter("email");
+        System.out.println(">>>ValidationLoginServlet.login="+login);
+
+        PrintWriter out = response.getWriter();
+
+        out.println("<div>");
+        out.println("<h1>Hello "+ email +" you had a successful login!</h1>");
+        out.println("</div>");
+        System.out.println(">> login="+login);
+
+    }
+}
+[1:57 PM, 3/11/2022] Likitha Mphasis: ublic class Login {
+	private String login;
+	private String password;
+
+	public Login() {
+	}
+
+	public Login(String login, String password) {
+		this.login = login;
+		this.password = password;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		return "Login{" + "login='" + login + '\'' + ", password='" + password + '\'' + '}';
+	}
+}
+
+// // // // // // // // // // // // // // 
+
+
+import javax.servlet.*;
+
+import javax.servlet.annotation.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+@WebFilter(filterName = "LoginFilter", urlPatterns = { "/ValidationLoginServlet" })
+public class LoginFilter implements Filter {
+	public void init(FilterConfig config) {
+	}
+
+	public void destroy() {
+	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws ServletException, IOException {
+		System.out.println("** doFilter **");
+
+		Login login = (Login) request.getAttribute("login");
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+
+		System.out.println(">>>>LoginFilter.login=" + login);
+
+		if (!validate(email, password)) {
+			System.out.println("Login/Password not okay");
+			PrintWriter out = response.getWriter();
+			RequestDispatcher rd=request.getRequestDispatcher("index.jsp");
+
+			out.println(
+					"<br/><span style='color:red; display: flex; flex-direction: column; align-items: center'>Invalid login / password. Try again");
+		} else {
+			System.out.println("Login/Password okay");
+
+			request.setAttribute("login", login);
+			request.setAttribute("email", email);
+			request.setAttribute("password", password);
+
+			chain.doFilter(request, response);
+		}
+
+	}
+
+	private boolean validate(String email, String password) {
+		System.out.println("Login=" + email);
+		System.out.println("Password=" + password);
+
+		if (email == null || password == null)
+			return false;
+		return email.equals("lokesh@gmail.com") && password.equals("lokesh@123");
+
+	}
+}
+
+/////////////////
+
+
+<%--
+  
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+    <form action="ValidationLoginServlet"  method="post" style="display: flex; flex-direction: column; align-items: center">
+        <br/>
+        <label>
+            Email: <input type="email" name="email"/>
+        </label>
+        <br/>
+        <label>
+            Password: <input type="password" name="password">
+        </label>
+        <br/>
+        <input type="submit" name="register" value="Submit">
+
+
+        <%  if(request.getParameter("register") != null) {%>
+            <jsp:useBean id="login"  class="to.Login" scope="request"/>
+            <jsp:setProperty name="login" property="*"/>
+            <jsp:forward page="/ValidationLoginServlet"/>
+        <%}%>
+    </form>
+</body>
+</html>
+
+
+////////////////////
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://tp://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>Phase2</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+  <!-- filter>
+  <display-name>LoginFilter</display-name>
+  <filter-name>LoginFilter</filter-name>
+  <filter-class>filter.LoginFilter</filter-class>
+  </filter><filter-mapping>
+  <filter-name>LoginFilter</filter-name>
+  <url-pattern>/ValidationLoginServlet</url-pattern>
+  <servlet-name>ValidationLoginServlet</servlet-name>
+  </filter-mapping-->
+</web-app>
