@@ -1,0 +1,15 @@
+This section will guide you to: 
+●	Delete an S3 bucket
+
+This lab has three subsections, namely:
+       3.12.1 Selecting the S3 bucket you want to delete
+       3.12.2 Deleting the bucket
+       3.12.3 Pushing the files to GitHub repositories
+
+
+Step 3.12.1: Selecting the S3 bucket you want to delete
+●	Choose the bucket
+ 
+
+
+Step 3.12.2: Deleting the bucket
